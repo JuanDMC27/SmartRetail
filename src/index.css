@@ -7,6 +7,11 @@
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
+  --white: #FFFFFF;
+  --primary: #6366F1;
+  --success: #10B981;
+  --info: #06B6D4;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -65,4 +70,40 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+.bg-primary {
+  background-color: var(--primary);
+}
+
+.text-white {
+  color: var(--white);
+}
+
+.bg-white\/20 {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.bg-accent {
+  background-color: var(--primary);
+}
+
+.bg-card {
+  background-color: var(--white);
+}
+
+.border-border {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.text-gray-800 {
+  color: #333;
+}
+
+.text-gray-500 {
+  color: #888;
+}
+
+.hover\:bg-primary\/90:hover {
+  background-color: rgba(99, 102, 241, 0.9);
 }
