@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Send, Bot, User, ChevronRight } from "lucide-react";
-import { ventas, productos, sucursales } from "../../data/dataVentas";
 import { cn } from "../utils";
 
 /**
@@ -18,7 +16,7 @@ import { cn } from "../utils";
  * @param {AISidebarProps} props
  * @returns {JSX.Element}
  */
-export function AISidebar({ isCollapsed, onToggle }) {
+export function AISidebar() {
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -30,6 +28,7 @@ export function AISidebar({ isCollapsed, onToggle }) {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const endRef = useRef(null);
 
   useEffect(() => {
@@ -39,54 +38,50 @@ export function AISidebar({ isCollapsed, onToggle }) {
   /**
    * Genera una respuesta simple del asistente según la consulta.
    * @param {string} text
-   * @returns {string}
+   * @returns {Promise<string>}
    */
-  const generateResponse = (text) => {
-    const msg = text.toLowerCase();
+  const generateResponse = async (text) => {
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: text }),
+      });
 
-    if (msg.includes("venta")) {
-      const total = ventas.reduce((s, v) => s + v.total, 0);
-      return `Actualmente hay ${ventas.length} ventas registradas con un total de ${total.toLocaleString("es-CO")} COP.`;
+      if (!response.ok) {
+        throw new Error(`Error del servidor: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.reply || "No he podido obtener una respuesta.";
+    } catch (error) {
+      console.error("Error generando respuesta:", error);
+      return "Lo siento, tuve un problema para conectarme al servidor. Por favor, intenta de nuevo más tarde.";
     }
-
-    if (msg.includes("producto")) {
-      const bajos = productos.filter((p) => p.stockActual < 15);
-      return `Hay ${bajos.length} productos con stock bajo.`;
-    }
-
-    if (msg.includes("sucursal")) {
-      const mejor = sucursales[Math.floor(Math.random() * sucursales.length)];
-      return `La mejor sucursal es ${mejor.nombre} ubicada en ${mejor.ciudad}.`;
-    }
-
-    if (msg.includes("recomendación")) {
-      return "Te recomiendo revisar el inventario semanalmente y promover los productos más vendidos.";
-    }
-
-    return "Puedo ayudarte con ventas, productos o sucursales. ¿Sobre qué quieres saber más?";
   };
 
   /**
    * Maneja el envío de un mensaje por el usuario.
    * @param {React.FormEvent} e
    */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
     const userMsg = { id: messages.length + 1, role: "user", content: input, timestamp: new Date() };
     setMessages((prev) => [...prev, userMsg]);
+    const currentInput = input;
     setInput("");
     setIsTyping(true);
 
-    setTimeout(() => {
-      const res = generateResponse(input);
-      setMessages((prev) => [
-        ...prev,
-        { id: prev.length + 1, role: "assistant", content: res, timestamp: new Date() },
-      ]);
-      setIsTyping(false);
-    }, 700);
+    const res = await generateResponse(currentInput);
+    setMessages((prev) => [
+      ...prev,
+      { id: prev.length + 1, role: "assistant", content: res, timestamp: new Date() },
+    ]);
+    setIsTyping(false);
   };
 
   const formatTime = (date) =>
@@ -98,15 +93,13 @@ export function AISidebar({ isCollapsed, onToggle }) {
         "h-screen bg-card border-l shadow-2xl flex flex-col transition-all duration-300",
         isCollapsed ? "w-0 border-none" : "w-96"
       )}
-    >
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onToggle}
-        className="absolute -left-3 top-6 h-6 w-6 rounded-full bg-card border shadow-md"
+    > 
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute -left-3 top-6 z-10 h-7 w-7 rounded-full bg-gray-700 border border-gray-600 shadow-md flex items-center justify-center hover:bg-gray-600 transition"
       >
         <ChevronRight className={cn("h-4 w-4 transition-transform", !isCollapsed && "rotate-180")} />
-      </Button>
+      </button>
 
       {!isCollapsed && (
         <>
@@ -176,9 +169,9 @@ export function AISidebar({ isCollapsed, onToggle }) {
                 className="flex-1"
                 disabled={isTyping}
               />
-              <Button type="submit" disabled={!input.trim() || isTyping} className="bg-primary hover:bg-primary/90">
+              <button type="submit" disabled={!input.trim() || isTyping} className="bg-primary hover:bg-primary/90 text-white p-2 rounded-md disabled:opacity-50">
                 <Send className="h-4 w-4" />
-              </Button>
+              </button>
             </form>
           </div>
         </>
