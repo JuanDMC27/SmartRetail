@@ -74,16 +74,15 @@ export function AISidebar() {
     if (!input.trim()) return;
 
     const userMsg = { id: messages.length + 1, role: "user", content: input, timestamp: new Date() };
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages((prev) => [...prev, userMsg]); // Add user message immediately
     const currentInput = input;
     setInput("");
     setIsTyping(true);
 
     const res = await generateResponse(currentInput);
-    setMessages((prev) => [
-      ...prev,
-      { id: prev.length + 1, role: "assistant", content: res, timestamp: new Date() },
-    ]);
+
+    const assistantMsg = { id: messages.length + 2, role: "assistant", content: res, timestamp: new Date() };
+    setMessages((prev) => [...prev, assistantMsg]); // Add assistant message
     setIsTyping(false);
   };
 
@@ -93,7 +92,7 @@ export function AISidebar() {
   return (
     <div
       className={cn(
-        "h-screen bg-card border-l shadow-2xl flex flex-col transition-all duration-300",
+        "h-screen bg-gray-900 text-white border-l border-gray-700 shadow-2xl flex flex-col transition-all duration-300",
         isCollapsed ? "w-0 border-none" : "w-96"
       )}
     > 
@@ -118,7 +117,7 @@ export function AISidebar() {
           </div>
 
           {/* Chat */}
-          <div className="flex-1 overflow-y-auto p-4 bg-muted/30 space-y-3">
+          <div className="flex-1 overflow-y-auto p-4 bg-gray-800/50 space-y-3">
             {messages.map((m) => (
               <div key={m.id} className={cn("flex gap-2", m.role === "user" ? "justify-end" : "justify-start")}>
                 {m.role === "assistant" && (
@@ -131,7 +130,7 @@ export function AISidebar() {
                     "max-w-[70%] p-3 rounded-2xl text-sm",
                     m.role === "user"
                       ? "bg-primary text-white"
-                      : "bg-white border border-border text-gray-800"
+                      : "bg-gray-700 text-white"
                   )}
                 >
                   <p>{m.content}</p>
@@ -163,13 +162,13 @@ export function AISidebar() {
           </div>
 
           {/* Campo de entrada */}
-          <div className="border-t p-3 bg-card">
+          <div className="border-t border-gray-700 p-3 bg-gray-900">
             <form onSubmit={handleSubmit} className="flex gap-2">
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Escribe tu mensaje..."
-                className="flex-1"
+                className="flex-1 bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
                 disabled={isTyping}
               />
               <button type="submit" disabled={!input.trim() || isTyping} className="bg-primary hover:bg-primary/90 text-white p-2 rounded-md disabled:opacity-50">
