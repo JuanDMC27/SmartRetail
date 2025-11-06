@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, ChevronLeft, Store, } from "lucide-react";
-import { IconComponent } from "react-icons";
+import { LayoutDashboard, Users, ChevronLeft } from "lucide-react";
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -59,7 +58,7 @@ export default function Sidebar() {
         <SidebarLink
           to="/admin/sucursales"
           label="Sucursales"
-          icon={Store}
+          icon={Users}
           active={location.pathname === "/admin/sucursales"}
           isCollapsed={isCollapsed}
         />
@@ -74,21 +73,19 @@ export default function Sidebar() {
 }
 
 /* --- Subcomponente para links --- */
-function SidebarLink({ to, label, icon: IcconComponet, active, isCollapsed }) {
-  function SidebarLink({ to, label, icon: IconComponent, active, isCollapsed }) {
-    return (
-      <Link
-        to={to}
-        className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 ${
-          active
-            ? "bg-indigo-600 text-white"
-            : "text-gray-400 hover:bg-gray-700 hover:text-white"
-        } ${isCollapsed ? "justify-center" : ""}`}
-        title={isCollapsed ? label : ''}
-      >
-        <IconComponent className="h-5 w-5 flex-shrink-0" />
-        {!isCollapsed && <span className="font-medium">{label}</span>}
-      </Link>
-    );
-  }
+function SidebarLink({ to, label, icon: Icon, active, isCollapsed }) {
+  return (
+    <Link
+      to={to}
+      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 ${
+        active
+          ? "bg-indigo-600 text-white"
+          : "text-gray-400 hover:bg-gray-700 hover:text-white"
+      } ${isCollapsed ? "justify-center" : ""}`}
+      title={isCollapsed ? label : undefined}
+    >
+      <Icon className="h-5 w-5 flex-shrink-0" />
+      {!isCollapsed && <span className="font-medium">{label}</span>}
+    </Link>
+  );
 }

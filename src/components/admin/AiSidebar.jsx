@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Input } from "../ui/Input";
+import { Input } from "../ui/input";
 import { Send, Bot, User, ChevronRight } from "lucide-react";
-import { cn } from "../utils";
+
+function cn(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
 
 /**
  * @typedef {"user" | "assistant"} MessageRole
@@ -42,7 +45,7 @@ export function AISidebar() {
    */
   const generateResponse = async (text) => {
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch("http://localhost:3000/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -98,7 +101,7 @@ export function AISidebar() {
         onClick={() => setIsCollapsed(!isCollapsed)}
         className="absolute -left-3 top-6 z-10 h-7 w-7 rounded-full bg-gray-700 border border-gray-600 shadow-md flex items-center justify-center hover:bg-gray-600 transition"
       >
-        <ChevronRight className={cn("h-4 w-4 transition-transform", !isCollapsed && "rotate-180")} />
+        <ChevronRight className={cn("h-4 w-4 text-white transition-transform", isCollapsed && "rotate-180")} />
       </button>
 
       {!isCollapsed && (
